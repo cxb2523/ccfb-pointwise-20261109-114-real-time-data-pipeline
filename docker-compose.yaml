@@ -72,11 +72,17 @@ services:
   producer:
     container_name: clickstream-producer
     build:
-      context: ./producer
+      # 上下文放到仓库根：镜像需要同时拿到 producer/ 与 layering/ 契约包
+      context: .
+      dockerfile: producer/Dockerfile
     depends_on:
       - broker
     environment:
       KAFKA_BROKER: broker:29092
+      # JSONL 样例落到挂载目录，容器退出后宿主机仍可离线核对
+      JSONL_SINK: /data/clickstream_samples.jsonl
+    volumes:
+      - ./data:/data
     networks:
       - iceberg_net
 
@@ -154,11 +160,11 @@ services:
         source: ${PWD}/flink/sql-client/flink-conf.yaml
         target: /opt/flink/conf/flink-conf.yaml
       - type: bind
-        source: ${PWD}/flink/sql-jobs/clickstream-filtering.sql
-        target: /opt/flink/clickstream-filtering.sql
+        source: ${PWD}/flink/sql-jobs/clickstream_layering.sql
+        target: /opt/flink/clickstream_layering.sql
     command: >
       /bin/sh -c "
-      /opt/flink/bin/sql-client.sh -f /opt/flink/clickstream-filtering.sql;
+      /opt/flink/bin/sql-client.sh -f /opt/flink/clickstream_layering.sql;
       tail -f /dev/null
       "
     networks:

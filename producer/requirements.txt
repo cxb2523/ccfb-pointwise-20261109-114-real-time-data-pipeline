@@ -1,2 +1,4 @@
+# 硬性依赖只有 faker；confluent_kafka 在 producer.py 里延迟 import，
+# 本地没装 MQ 客户端时会自动跳过 Kafka、只写 JSONL sink。
 faker
 confluent-kafka

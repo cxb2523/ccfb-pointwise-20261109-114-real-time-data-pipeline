@@ -1,0 +1,8 @@
+# Python
+__pycache__/
+*.py[cod]
+.pytest_cache/
+
+# producer 双 sink 落盘的样例（容器内写 data/，本地裸跑写仓库根）
+clickstream_samples.jsonl
+data/
